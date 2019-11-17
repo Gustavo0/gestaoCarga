@@ -16,11 +16,10 @@ paths:
       tags:
       - "Delivery"
       summary: "Cadastro de um conjunto de cargas para um veículo."
-      operationId: "addPet"
       consumes:
       - "application/json"
       produces:
-      - "application/xml"
+      - "application/json"
       parameters:
       - in: "body"
         name: "body"
@@ -32,7 +31,50 @@ paths:
           description: "Entrega criada com sucesso"
         400:
           description: "Erro na criação da entrega"
+  /delivery/{deliveryId}/step:
+    post:
+      tags:
+      - "Delivery Steps"
+      summary: "Consulta de instruções de abastecimento do veículo."
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "deliveryId"
+        in: "path"
+        description: "ID da delivery"
+        required: true
+        type: "integer"
+        format: "int64"
+      responses:
+        200:
+          description: "Sucesso!!"
+          schema:
+            $ref: "#/definitions/SaidaStepsDeliveryDto"
+        400:
+          description: "Id invalido"
 definitions:
+  SaidaStepsDeliveryDto:
+    type: "object"
+    properties:
+      steps:
+        type: "array"
+        items:
+          $ref: "#/definitions/Step"
+  Step:
+    type: "object"
+    properties:
+      step: 
+        type: "integer"
+        format: "int64"
+      packageId:
+        type: "integer"
+        format: "int64"
+      from:
+        type: "string"
+      to:
+        type: "string"
   DeliveryDto:
     type: "object"
     properties:
@@ -46,6 +88,8 @@ definitions:
         type: "array"
         items:
           $ref: "#/definitions/Packages"
+        minItems: 1
+        maxItems: 3
   Packages:
     type: "object"
     properties:

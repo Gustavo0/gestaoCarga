@@ -23,6 +23,15 @@ public class ErrorInterceptor {
 	private MessageSource messageSource;
 	
 	@ResponseStatus(code = HttpStatus.BAD_REQUEST)
+	@ExceptionHandler(Exception.class)
+	public List<ErroDto> handle(Exception exception) {
+		List<ErroDto> dto = new ArrayList<>();
+		ErroDto erro = new ErroDto(exception.getClass().getName(), exception.getMessage());
+		dto.add(erro);
+		return dto;
+	}
+	
+	@ResponseStatus(code = HttpStatus.BAD_REQUEST)
 	@ExceptionHandler(MethodArgumentNotValidException.class)
 	public List<ErroDto> handle(MethodArgumentNotValidException exception) {
 		List<FieldError> fieldErrors = exception.getBindingResult().getFieldErrors();

@@ -23,8 +23,8 @@ public class DeliveryControllerTest extends AbstractTestJUnit{
 	private Dsl dsl;
 	
 	@Test
-	public void cadastroCreatedTest() {
-		Delivery delivery = dsl.dadoUmaDeliveryComPackagesCadastrado();
+	public void cadastroCreatedTest() throws Exception {
+		Delivery delivery = dsl.dadoUmaDeliveryComPackagesCadastrado(4L, 1L);
 		
 		DeliverySaidaDto deliverySaida = given()
 											.contentType(ContentType.JSON)
@@ -37,7 +37,35 @@ public class DeliveryControllerTest extends AbstractTestJUnit{
 													.statusCode(HttpStatus.CREATED.value())
 													.extract().as(DeliverySaidaDto.class);
 		
-		Assert.assertEquals(deliverySaida.getDeliveryId(), delivery.getDeliveryId());
+		Assert.assertFalse(deliverySaida.getDeliveryId().equals(delivery.getDeliveryId()));
+	}
+	
+	@Test
+	public void cadastroBadRequestTest() throws Exception {
+		dsl.dadoUmaDeliveryComPackagesCadastrado(1L, 1L);
+		
+		given()
+			.contentType(ContentType.JSON)
+			.body(dsl.dadoUmaRequestBody(false))
+			.when()
+				.post("/delivery")
+			.then()
+				.log().all()
+				.assertThat()
+					.statusCode(HttpStatus.BAD_REQUEST.value());
+	}
+	
+	@Test
+	public void consultaInstrucoesTest() throws Exception {
+		dsl.dadoUmaDeliveryComPackagesCadastrado(5L, 1L);
+		
+		given()
+		.when()
+			.get("/delivery/{deliveryId}/step", 5)
+		.then()
+			.log().all()
+			.assertThat()
+				.statusCode(HttpStatus.OK.value());
 	}
 	
 }

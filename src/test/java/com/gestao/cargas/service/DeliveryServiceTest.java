@@ -10,7 +10,9 @@ import org.springframework.test.context.junit4.AbstractJUnit4SpringContextTests;
 import org.springframework.test.context.web.WebAppConfiguration;
 
 import com.gestao.cargas.dsl.Dsl;
+import com.gestao.cargas.dto.SaidaStepsDeliveryDto;
 import com.gestao.cargas.entity.Delivery;
+import com.gestao.cargas.entity.Movimentos;
 import com.gestao.cargas.entity.Package;
 
 @WebAppConfiguration
@@ -21,20 +23,66 @@ public class DeliveryServiceTest extends AbstractJUnit4SpringContextTests{
 	private Dsl dsl;
 	
 	@Test
-	public void cadastrarDelivery() {
-		Delivery delivery = dsl.dadoUmaDeliveryComPackagesCadastrado();
+	public void cadastrarDelivery() throws Exception {
+		Delivery delivery = dsl.dadoUmaDeliveryComPackagesCadastrado(1L, 1L);
 		
 		Assert.assertEquals(delivery.getDeliveryId().longValue(), 1L);
 		Assert.assertEquals(delivery.getVehicle().longValue(), 1L);
 	}
 	
 	@Test
-	public void cadastrarDeliveryComPackages() {
-		Delivery delivery = dsl.dadoUmaDeliveryComPackagesCadastrado();
+	public void cadastrarDeliveryComPackages() throws Exception {
+		Delivery delivery = dsl.dadoUmaDeliveryComPackagesCadastrado(2L, 1L);
 		List<Package> packages = dsl.buscaPackagesByDelivery(delivery);
 		
 		Assert.assertEquals(packages.size(), 1L);
-		Assert.assertTrue(Double.compare(packages.get(0).getWeight().doubleValue(), 14.5) == 0);
+		Assert.assertTrue(Double.compare(packages.get(0).getWeight().doubleValue(), 15.5) == 0);
 	}
-
+	
+	@Test
+	public void deliveryComPackagesComUmPasso() throws Exception {
+		Delivery delivery = dsl.dadoUmaDeliveryComPackagesCadastrado(3L, 1L);
+		List<Package> packages = dsl.buscaPackagesByDelivery(delivery);
+		List<SaidaStepsDeliveryDto> steps = dsl.montaStepsDelivery(packages);
+		Assert.assertEquals(steps.size(), 1L);
+		Assert.assertEquals(steps.get(0).getFrom(), Movimentos.ZONA_DE_ABASTECIMENTO);
+		Assert.assertEquals(steps.get(0).getTo(), Movimentos.ZONA_DO_CAMINHAO);
+	}
+	
+	@Test
+	public void deliveryComPackagesComTresPassos() throws Exception {
+		Delivery delivery = dsl.dadoUmaDeliveryComPackagesCadastrado(4L, 2L);
+		List<Package> packages = dsl.buscaPackagesByDelivery(delivery);
+		List<SaidaStepsDeliveryDto> steps = dsl.montaStepsDelivery(packages);
+		Assert.assertEquals(steps.size(), 3L);
+		Assert.assertEquals(steps.get(0).getFrom(), Movimentos.ZONA_DE_ABASTECIMENTO);
+		Assert.assertEquals(steps.get(0).getTo(), Movimentos.ZONA_DE_TRANSFERENCIA);
+		Assert.assertEquals(steps.get(1).getFrom(), Movimentos.ZONA_DE_ABASTECIMENTO);
+		Assert.assertEquals(steps.get(1).getTo(), Movimentos.ZONA_DO_CAMINHAO);
+		Assert.assertEquals(steps.get(2).getFrom(), Movimentos.ZONA_DE_TRANSFERENCIA);
+		Assert.assertEquals(steps.get(2).getTo(), Movimentos.ZONA_DO_CAMINHAO);
+	}
+	
+	@Test
+	public void deliveryComPackagesComSetePassos() throws Exception {
+		Delivery delivery = dsl.dadoUmaDeliveryComPackagesCadastrado(5L, 3L);
+		List<Package> packages = dsl.buscaPackagesByDelivery(delivery);
+		List<SaidaStepsDeliveryDto> steps = dsl.montaStepsDelivery(packages);
+		Assert.assertEquals(steps.size(), 7L);
+		Assert.assertEquals(steps.get(0).getFrom(), Movimentos.ZONA_DE_ABASTECIMENTO);
+		Assert.assertEquals(steps.get(0).getTo(), Movimentos.ZONA_DO_CAMINHAO);
+		Assert.assertEquals(steps.get(1).getFrom(), Movimentos.ZONA_DE_ABASTECIMENTO);
+		Assert.assertEquals(steps.get(1).getTo(), Movimentos.ZONA_DE_TRANSFERENCIA);
+		Assert.assertEquals(steps.get(2).getFrom(), Movimentos.ZONA_DO_CAMINHAO);
+		Assert.assertEquals(steps.get(2).getTo(), Movimentos.ZONA_DE_TRANSFERENCIA);
+		Assert.assertEquals(steps.get(3).getFrom(), Movimentos.ZONA_DE_ABASTECIMENTO);
+		Assert.assertEquals(steps.get(3).getTo(), Movimentos.ZONA_DO_CAMINHAO);
+		Assert.assertEquals(steps.get(4).getFrom(), Movimentos.ZONA_DE_TRANSFERENCIA);
+		Assert.assertEquals(steps.get(4).getTo(), Movimentos.ZONA_DE_ABASTECIMENTO);
+		Assert.assertEquals(steps.get(5).getFrom(), Movimentos.ZONA_DE_TRANSFERENCIA);
+		Assert.assertEquals(steps.get(5).getTo(), Movimentos.ZONA_DO_CAMINHAO);
+		Assert.assertEquals(steps.get(6).getFrom(), Movimentos.ZONA_DE_ABASTECIMENTO);
+		Assert.assertEquals(steps.get(6).getTo(), Movimentos.ZONA_DO_CAMINHAO);
+	}
+	
 }

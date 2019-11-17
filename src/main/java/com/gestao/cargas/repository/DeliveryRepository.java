@@ -7,5 +7,7 @@ import com.gestao.cargas.entity.Delivery;
 
 @Repository
 public interface DeliveryRepository extends JpaRepository<Delivery, Long> {
+	
+	Delivery findByDeliveryId(Long deliveryId);
 
 }

@@ -18,6 +18,8 @@ public class DeliveryDto {
 	
 	private Long deliveryId;
 	private Long vehicle;
+	
+	
 	private List<Package> packages;
 	
 	public DeliveryDto(Delivery delivery) {
