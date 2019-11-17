@@ -1,6 +1,7 @@
 # gestaoCarga
 
  Foram construídas duas apis (/delivery e / delivery/{deliveryId}/step)
+ 
  Documentação das apis está no endereço abaixo:
  gestaoCarga/src/main/resources/swagger.json
  
